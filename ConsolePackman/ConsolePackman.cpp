@@ -79,7 +79,7 @@ void Player(int x, int y) {
     SetConsoleTextAttribute(handle, FOREGROUND_YELLOW);
 
     gotoXY(x, y);
-    cout << '@';
+    cout << '0';
 }
 
 void PlayerMovement(char** map, int& xPos, int& yPos, int& count) {
@@ -154,6 +154,7 @@ void countShow(int width, int height, int count) {
 
 int main()
 {
+    bool start = false;
     // Создание карты
     pair<int, int> size = sizeMap();
     int width = size.first;
@@ -165,8 +166,21 @@ int main()
     }
     mapFill(map, width, height);
     int xPos = width / 2, yPos = height / 2;
-    int kbhit;
     int count = 0;
+
+    //Start Game Menu
+    if (start != true) {
+        while (true)
+        {
+            gotoXY(0, 0);
+            cout << "Press Key to START GAME!";
+            if (_kbhit()) {
+                start = true;
+                break;
+            }
+        }
+    }
+    // Game Started
     while (true)
     {
         system("cls");
