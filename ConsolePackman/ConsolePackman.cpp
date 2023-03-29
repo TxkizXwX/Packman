@@ -7,12 +7,11 @@
 
 #define FOREGROUND_YELLOW 14
 
-#define W 115
-#define D 100
-#define S 119
-#define A 97
-
 using namespace std;
+
+enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
+
+eDirection dir;
 
 void gotoXY(int x, int y) {
     COORD pos = { x, y };
@@ -73,7 +72,7 @@ void mapShow(char** map, const int width, const int height) {
     }
 }
 
-void Player(int x, int y) {
+void PacmanShow(int x, int y) {
     // Color
     HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(handle, FOREGROUND_YELLOW);
@@ -82,66 +81,49 @@ void Player(int x, int y) {
     cout << '0';
 }
 
-void PlayerMovement(char** map, int& xPos, int& yPos, int& count) {
+void Input() {
     if (_kbhit())
     {
         switch (_getch()) {
-        case S:
-            if (map[yPos - 1][xPos] != '#') {
-                yPos--;
-                if (map[yPos][xPos] == '*') {
-                    map[yPos][xPos] = ' ';
-                    count++;
-                }
-            }
+        case 's':
+            dir = DOWN;
             break;
-        case D:
-            if (map[yPos][xPos + 1] != '#') {
-                xPos++;
-                if (map[yPos][xPos] == '*') {
-                    map[yPos][xPos] = ' ';
-                    count++;
-                }
-            }
+        case 'd':
+            dir = RIGHT;
             break;
-        case W:
-            if (map[yPos + 1][xPos] != '#') {
-                yPos++;
-                if (map[yPos][xPos] == '*') {
-                    map[yPos][xPos] = ' ';
-                    count++;
-                }
-            }
+        case 'w':
+            dir = UP;
             break;
-        case A:
-            if (map[yPos][xPos - 1] != '#') {
-                xPos--;
-                if (map[yPos][xPos] == '*') {
-                    map[yPos][xPos] = ' ';
-                    count++;
-                }
-            }
+        case 'a':
+            dir = LEFT;
             break;
         }
     }
-    /*else {
-        if (getch == W) {
-            if (map[yPos + 1][xPos] != '#')
-                yPos++;
-        }
-        else if (getch == S) {
-            if (map[yPos - 1][xPos] != '#')
-                yPos--;
-        }
-        else if (getch == A) {
-            if (map[yPos][xPos - 1] != '#')
-                xPos--;
-        }
-        else if (getch == D){
-            if (map[yPos][xPos + 1] != '#')
-                xPos++;
-        }
-    }*/
+}
+
+void Logic(char** map, int& xPos, int& yPos, int& count){
+    switch (dir) {
+    case UP:
+        if (map[yPos - 1][xPos] == '#') break;
+        yPos--;
+        break;
+    case DOWN:
+        if (map[yPos + 1][xPos] == '#') break;
+        yPos++;
+        break;
+    case LEFT:
+        if (map[yPos][xPos - 1] == '#') break;
+        xPos--;
+        break;
+    case RIGHT:
+        if (map[yPos][xPos + 1] == '#') break;
+        xPos++;
+        break;
+    }
+    if (map[yPos][xPos] == '*') {
+        map[yPos][xPos] = ' ';
+        count++;
+    }
 }
 
 void countShow(int width, int height, int count) {
@@ -186,8 +168,9 @@ int main()
         system("cls");
         mapShow(map, width, height);
         countShow(width, height, count);
-        Player(xPos, yPos);
-        PlayerMovement(map, xPos, yPos, count);
+        PacmanShow(xPos, yPos);
+        Input();
+        Logic(map, xPos, yPos, count);
         this_thread::sleep_for(0.1s);
     }
 
